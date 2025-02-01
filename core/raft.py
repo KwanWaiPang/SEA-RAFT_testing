@@ -28,6 +28,7 @@ class RAFT(
         self.args.corr_levels = 4
         self.args.corr_radius = args.radius
         self.args.corr_channel = args.corr_levels * (args.radius * 2 + 1) ** 2
+        # context network
         self.cnet = ResNetFPN(args, input_dim=6, output_dim=2 * self.args.dim, norm_layer=nn.BatchNorm2d, init_weight=True)
 
         # conv for iter 0 results

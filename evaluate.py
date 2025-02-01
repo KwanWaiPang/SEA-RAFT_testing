@@ -151,10 +151,11 @@ def validate_middlebury(args, model):
     f1 = 100 * out_valid_pixels / num_valid_pixels
     print("Validation middlebury: %f, %f" % (epe, f1))
 
+# 运行验证函数
 def eval(args):
-    args.gpus = [0]
-    model = RAFT(args)
-    load_ckpt(model, args.model)
+    args.gpus = [0] #采用GPU0
+    model = RAFT(args) #加载模型（初始化RAFT类）
+    load_ckpt(model, args.model)#加载模型参数
     model = model.cuda()
     model.eval()
     with torch.no_grad():
