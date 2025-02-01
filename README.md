@@ -57,19 +57,21 @@ pip install huggingface_hub
 python custom.py --cfg config/eval/spring-M.json --path models/Tartan-C-T-TSKH-spring540x960-M.pth
 ~~~
 
-测试效果如下：
+测试效果如下
+
+输入图片：
 <div align="center">
   <img src="./custom/image1.jpg" width="60%" />
   <img src="./custom/image2.jpg" width="60%" />
 <figcaption>  
-输入
 </figcaption>
 </div>
 
+输出结果：
 <div align="center">
   <img src="./custom/flow.jpg" width="60%" />
   <img src="./custom/heatmap.jpg" width="60%" />
 <figcaption>  
-输出结果
+
 </figcaption>
 </div>
