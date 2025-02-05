@@ -9,7 +9,7 @@
 
 [comment]: <> (  <h2 align="center">PAPER</h2>)
   <h3 align="center">
-  <a href="https://kwanwaipang.github.io/Blog_basedon_markdown/SEA-RAFT/">Blog</a> 
+  <a href="https://kwanwaipang.github.io/SEA-RAFT/">Blog</a> 
   | <a href="https://github.com/princeton-vl/SEA-RAFT">Original Github Page</a>
   </h3>
   <div align="justify">
