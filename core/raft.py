@@ -100,7 +100,7 @@ class RAFT(
         cnet = self.init_conv(cnet)#3x3卷积核
         net, context = torch.split(cnet, [self.args.dim, self.args.dim], dim=1)
 
-        # init flow
+        # init flow（此处应该是初始化光流～）
         flow_update = self.flow_head(net)
         weight_update = .25 * self.upsample_weight(net)
         flow_8x = flow_update[:, :2]
@@ -134,7 +134,7 @@ class RAFT(
             flow_predictions[i] = padder.unpad(flow_predictions[i])
             info_predictions[i] = padder.unpad(info_predictions[i])
 
-        if test_mode == False:
+        if test_mode == False:#验证模式为False
             # exlude invalid pixels and extremely large diplacements
             nf_predictions = []
             for i in range(len(info_predictions)):
@@ -156,7 +156,7 @@ class RAFT(
                 # term1: [N, m, H, W]
                 term1 = weight - math.log(2) - log_b
                 nf_loss = torch.logsumexp(weight, dim=1, keepdim=True) - torch.logsumexp(term1.unsqueeze(1) - term2, dim=2)
-                nf_predictions.append(nf_loss)
+                nf_predictions.append(nf_loss)#此处计算的是Mixture of Laplace的loss中的一项，传到外面使用
 
             return {'final': flow_predictions[-1], 'flow': flow_predictions, 'info': info_predictions, 'nf': nf_predictions}
         else:

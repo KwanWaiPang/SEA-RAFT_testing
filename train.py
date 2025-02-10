@@ -9,10 +9,10 @@ from config.parser import parse_args
 import torch
 import torch.optim as optim
 
-from raft import RAFT
+from core.raft import RAFT
 from datasets import fetch_dataloader
 from utils.utils import load_ckpt
-from loss import sequence_loss
+from core.loss import sequence_loss
 from ddp_utils import *
 
 os.system("export KMP_INIT_AT_FORK=FALSE")
@@ -51,7 +51,7 @@ def train(args, rank=0, world_size=1, use_ddp=False):
             optimizer.zero_grad()
             image1, image2, flow, valid = [x.cuda(non_blocking=True) for x in data_blob]
             output = model(image1, image2, flow_gt=flow, iters=args.iters)
-            loss = sequence_loss(output, flow, valid, args.gamma)
+            loss = sequence_loss(output, flow, valid, args.gamma)#计算loss
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip) 
             optimizer.step()
