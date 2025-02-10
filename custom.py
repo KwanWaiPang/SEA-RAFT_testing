@@ -77,15 +77,18 @@ def get_heatmap(info, args):
     return heatmap
 
 def forward_flow(args, model, image1, image2):
-    output = model(image1, image2, iters=args.iters, test_mode=True)
+    # 输出计算结果
+    output = model(image1, image2, iters=args.iters, test_mode=True)#调用forward函数，config/eval/spring-M.json中iters=4
     flow_final = output['flow'][-1]
     info_final = output['info'][-1]
     return flow_final, info_final
 
+# 计算光流
 def calc_flow(args, model, image1, image2):
     img1 = F.interpolate(image1, scale_factor=2 ** args.scale, mode='bilinear', align_corners=False)
     img2 = F.interpolate(image2, scale_factor=2 ** args.scale, mode='bilinear', align_corners=False)
     H, W = img1.shape[2:]
+    # 输入图像，进行光流计算
     flow, info = forward_flow(args, model, img1, img2)
     flow_down = F.interpolate(flow, scale_factor=0.5 ** args.scale, mode='bilinear', align_corners=False) * (0.5 ** args.scale)
     info_down = F.interpolate(info, scale_factor=0.5 ** args.scale, mode='area')
@@ -95,6 +98,7 @@ def calc_flow(args, model, image1, image2):
 def demo_data(path, args, model, image1, image2):
     os.system(f"mkdir -p {path}")
     H, W = image1.shape[2:]
+    # 计算光流
     flow, info = calc_flow(args, model, image1, image2)
     flow_vis = flow_to_image(flow[0].permute(1, 2, 0).cpu().numpy(), convert_to_bgr=True)
     cv2.imwrite(f"{path}flow.jpg", flow_vis)
@@ -135,8 +139,8 @@ def main():
         device = torch.device('cuda')
     else:
         device = torch.device('cpu')
-    model = model.to(device)
-    model.eval()
+    model = model.to(device)#将模型加载到设备上
+    model.eval()#模型进入评估模式
     demo_custom(model, args, device=device)
 
 if __name__ == '__main__':

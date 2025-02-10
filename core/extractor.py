@@ -22,6 +22,8 @@ class ResNetFPN(nn.Module):
             block_dims[i] = int(block_dims[i] * ratio)
         # Networks
         self.conv1 = nn.Conv2d(input_dim, initial_dim, kernel_size=7, stride=2, padding=3)
+        # N = (W - F + 2P) / S + 1
+        # N=（W-7+2*3）/2+1=（W-7+6+2）/2=（W+1）/2
         self.bn1 = norm_layer(initial_dim)
         self.relu = nn.ReLU(inplace=True)
         if args.pretrain == 'resnet34':
@@ -33,7 +35,7 @@ class ResNetFPN(nn.Module):
         self.layer1 = self._make_layer(block, block_dims[0], stride=1, norm_layer=norm_layer, num=n_block[0])  # 1/2
         self.layer2 = self._make_layer(block, block_dims[1], stride=2, norm_layer=norm_layer, num=n_block[1])  # 1/4
         self.layer3 = self._make_layer(block, block_dims[2], stride=2, norm_layer=norm_layer, num=n_block[2])  # 1/8
-        self.final_conv = conv1x1(block_dims[2], output_dim)
+        self.final_conv = conv1x1(block_dims[2], output_dim)#1x1卷积核实现维度的变换
         self._init_weights(args)
 
     def _init_weights(self, args):
@@ -49,6 +51,7 @@ class ResNetFPN(nn.Module):
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
 
+        # 在torchvision中加载预训练模型（提供ResNet18和ResNet34的预训练模型）
         if self.init_weight:
             from torchvision.models import resnet18, ResNet18_Weights, resnet34, ResNet34_Weights
             if args.pretrain == 'resnet18':

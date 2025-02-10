@@ -31,8 +31,8 @@ class RAFT(
         # context network
         self.cnet = ResNetFPN(args, input_dim=6, output_dim=2 * self.args.dim, norm_layer=nn.BatchNorm2d, init_weight=True)
 
-        # conv for iter 0 results
-        self.init_conv = conv3x3(2 * args.dim, 2 * args.dim)
+        # conv for iter 0 results（第0代的时候）
+        self.init_conv = conv3x3(2 * args.dim, 2 * args.dim)#3x3卷积核
         self.upsample_weight = nn.Sequential(
             # convex combination of 3x3 patches
             nn.Conv2d(args.dim, args.dim * 2, 3, padding=1),
@@ -45,7 +45,8 @@ class RAFT(
             nn.ReLU(inplace=True),
             nn.Conv2d(2 * args.dim, 6, 3, padding=1)
         )
-        if args.iters > 0:
+        if args.iters > 0:#当大于0时，进行迭代，才运行feature network
+            # 初始化feature network，跟context network一样，只是输入输出维度不一样～
             self.fnet = ResNetFPN(args, input_dim=3, output_dim=self.output_dim, norm_layer=nn.BatchNorm2d, init_weight=True)
             self.update_block = BasicUpdateBlock(args, hdim=args.dim, cdim=args.dim)
     
@@ -90,13 +91,13 @@ class RAFT(
         info_predictions = []
 
         # padding
-        padder = InputPadder(image1.shape)
+        padder = InputPadder(image1.shape)#将图像预处理使得可以被8整除
         image1, image2 = padder.pad(image1, image2)
         N, _, H, W = image1.shape
         dilation = torch.ones(N, 1, H//8, W//8, device=image1.device)
-        # run the context network
+        # run the context network（提取特征）
         cnet = self.cnet(torch.cat([image1, image2], dim=1))
-        cnet = self.init_conv(cnet)
+        cnet = self.init_conv(cnet)#3x3卷积核
         net, context = torch.split(cnet, [self.args.dim, self.args.dim], dim=1)
 
         # init flow
@@ -108,11 +109,11 @@ class RAFT(
         flow_predictions.append(flow_up)
         info_predictions.append(info_up)
             
-        if self.args.iters > 0:
+        if self.args.iters > 0:#当大于0时，进行迭代，才运行feature network
             # run the feature network
-            fmap1_8x = self.fnet(image1)
+            fmap1_8x = self.fnet(image1)#提取特征
             fmap2_8x = self.fnet(image2)
-            corr_fn = CorrBlock(fmap1_8x, fmap2_8x, self.args)
+            corr_fn = CorrBlock(fmap1_8x, fmap2_8x, self.args)#计算相关性
 
         for itr in range(iters):
             N, _, H, W = flow_8x.shape
