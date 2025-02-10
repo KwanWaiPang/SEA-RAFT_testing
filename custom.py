@@ -14,7 +14,7 @@ import torch.utils.data as data
 from config.parser import parse_args
 
 import datasets
-from raft import RAFT
+from core.raft import RAFT #添加文件夹以实现跳转到raft的代码
 from utils.flow_viz import flow_to_image
 from utils.utils import load_ckpt
 
@@ -117,14 +117,16 @@ def demo_custom(model, args, device=torch.device('cuda')):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cfg', help='experiment configure file name', required=True, type=str)
-    parser.add_argument('--path', help='checkpoint path', type=str, default=None)
+    parser.add_argument('--path', help='checkpoint path', type=str, default=None) #导入预训练模型
     parser.add_argument('--url', help='checkpoint url', type=str, default=None)
     parser.add_argument('--device', help='inference device', type=str, default='cpu')
     args = parse_args(parser)
     if args.path is None and args.url is None:
-        raise ValueError("Either --path or --url must be provided")
+        raise ValueError("Either --path or --url must be provided")#必须提供其中一个
+    
+    # Load model
     if args.path is not None:
-        model = RAFT(args)
+        model = RAFT(args)#加载模型
         load_ckpt(model, args.path)
     else:
         model = RAFT.from_pretrained(args.url, args=args)
