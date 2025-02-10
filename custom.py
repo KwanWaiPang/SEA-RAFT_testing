@@ -14,7 +14,7 @@ import torch.utils.data as data
 from config.parser import parse_args
 
 import datasets
-from raft import RAFT
+from core.raft import RAFT #添加文件夹以实现跳转到raft的代码
 from utils.flow_viz import flow_to_image
 from utils.utils import load_ckpt
 
